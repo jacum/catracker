@@ -29,8 +29,6 @@ spec:
             requests:
               memory: 64Mi
           volumeMounts:
-            - mountPath: /files
-              name: files
             - mountPath: /var/cache/nginx
               name: cache-http
         - name: app
@@ -53,13 +51,10 @@ spec:
               memory: 1G
             requests:
               memory: 512Mi
-          volumeMounts:
-            - name: files
-              mountPath: /files
-            - name: cache
-              mountPath: /cache
       volumes:
         - name: cache
+          emptyDir: {}
+        - name: cache-http
           emptyDir: {}
 #        - name: config
 #          configMap:
