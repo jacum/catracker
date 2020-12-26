@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catracker
+  labels:
+    uri: catracker-demo.jacum.com
+spec:
+  selector:
+    matchLabels:
+      uri: catracker-demo.jacum.com
+  template:
+    metadata:
+      labels:
+        uri: catracker-demo.jacum.com
+    spec:
+      containers:
+        - name: http
+          imagePullPolicy: Always
+          image: eblovich/http
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 101
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 128Mi
+            requests:
+              memory: 64Mi
+          volumeMounts:
+            - mountPath: /files
+              name: files
+            - mountPath: /var/cache/nginx
+              name: cache-http
+        - name: app
+          imagePullPolicy: Always
+          image: eblovich/catracker:APP_VERSION
+          env:
+#            - name: DATABASE_PASSWORD
+#              valueFrom:
+#                secretKeyRef:
+#                  name: catracker-secrets
+#                  key: DATABASE_PASSWORD
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+          ports:
+            - containerPort: 8081
+          resources:
+            limits:
+              memory: 1G
+            requests:
+              memory: 512Mi
+          volumeMounts:
+            - name: files
+              mountPath: /files
+            - name: cache
+              mountPath: /cache
+      volumes:
+        - name: cache
+          emptyDir: {}
+#        - name: config
+#          configMap:
+#            name: catracker-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catracker-service
+spec:
+  selector:
+    uri: catracker-demo.jacum.com
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      targetPort: 8080
+      port: 8080
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: catracker-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "True"
+spec:
+  rules:
+    - host: catracker-demo.pragmasoft.nl
+      http:
+        paths:
+          - backend:
+              serviceName: catracker-service
+              servicePort: 8081
+  tls:
+    - hosts:
+        - catracker-demo.jacum.com
+      secretName:  catracker-tls
+#---
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: catracker-config
+#data:
+#  settings_env.py: |
+#    DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+#    DATABASE_HOST = 'mariadb'

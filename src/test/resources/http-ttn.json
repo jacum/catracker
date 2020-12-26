@@ -1,0 +1,38 @@
+{
+  "app_id": "pragma_cats_tabs",
+  "dev_id": "tabs_test1",
+  "hardware_serial": "58A0CB0000204688",
+  "port": 136,
+  "counter": 85,
+  "payload_raw": "CO4y0IUeA3hxS0A=",
+  "payload_fields": {
+    "accuracy": 16,
+    "bytes": "CO4y0IUeA3hxS0A=",
+    "capacity": 93.33333333333333,
+    "gnss_fix": false,
+    "latitude": 52.331984,
+    "longitude": 4.944248,
+    "port": 136,
+    "temperature": 18,
+    "voltage": 3.9
+  },
+  "metadata": {
+    "time": "2020-12-25T12:07:49.102008218Z",
+    "frequency": 868.5,
+    "modulation": "LORA",
+    "data_rate": "SF12BW125",
+    "coding_rate": "4/5",
+    "gateways": [
+      {
+        "gtw_id": "eui-58a0cbfffe802a34",
+        "timestamp": 48747028,
+        "time": "2020-12-25T12:07:49.168767929Z",
+        "channel": 0,
+        "rssi": -68,
+        "snr": 6.5,
+        "rf_chain": 0
+      }
+    ]
+  },
+  "downlink_url": "https://integrations.thethingsnetwork.org/ttn-eu/api/v2/down/pragma_cats_tabs/requestbin?key=ttn-account-v2.yG7tTCBkMQ8Ktg35n6rBsiUEGPIWLdf36mW_v_Mfwp8"
+}

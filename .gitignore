@@ -1,0 +1,11 @@
+**/target
+*.class
+*.log
+/.bsp/
+target
+.idea
+
+.sbt.ivy.lock
+cache
+node_modules
+public

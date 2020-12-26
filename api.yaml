@@ -1,0 +1,164 @@
+openapi: 3.0.1
+info:
+  title: Catracker
+  version: 0.1
+  description: Catracker
+paths:
+  /ttnhttp:
+    post:
+      operationId: incomingEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/TTNEvent'
+      responses:
+        '201':
+          description: Created
+  /paths/{device}:
+    get:
+      operationId: pathForDevice
+      parameters:
+        - in: path
+          name: device
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePath'
+
+servers:
+  - url: http://host
+components:
+  schemas:
+    DevicePath:
+      type: object
+      required:
+        - description
+        - positions
+      properties:
+        description:
+          type: string
+        positions:
+          type: array
+          items:
+            type: object
+            required:
+              - latitude
+              - longitude
+              - time
+            properties:
+              latitude:
+                type: number
+                format: double
+              longitude:
+                type: number
+                format: double
+              time:
+                type: string
+                format: date-time
+    TTNEvent:
+      type: object
+      required:
+        - app_id
+        - dev_id
+        - hardware_serial
+        - port
+        - counter
+        - payload_fields
+        - metadata
+      properties:
+        app_id:
+          type: string
+        dev_id:
+          type: string
+        hardware_serial:
+          type: string
+        counter:
+          type: integer
+          format: int32
+        payload_fields:
+          type: object
+          required:
+            - accuracy
+            - capacity
+            - gnss_fix
+            - latitude
+            - longitude
+            - temperature
+            - voltage
+          properties:
+            accuracy:
+              type: integer
+              format: int32
+            capacity:
+              type: number
+            gnss_fix:
+              type: boolean
+            latitude:
+              type: number
+              format: double
+            longitude:
+              type: number
+              format: double
+            port:
+              type: integer
+              format: int32
+            temperature:
+              type: integer
+              format: int32
+            voltage:
+              type: number
+        metadata:
+          type: object
+          required:
+            - time
+            - frequency
+            - modulation
+            - data_rate
+            - coding_rate
+            - gateways
+          properties:
+            time:
+              type: string
+              format: date-time
+            frequency:
+              type: number
+            modulation:
+              type: string
+            data_rate:
+              type: string
+            coding_rate:
+              type: string
+            gateways:
+              type: array
+              items:
+                type: object
+                required:
+                  - gtw_id
+                  - time
+                  - channel
+                  - rssi
+                  - snr
+                properties:
+                  gtw_id:
+                    type: string
+                  time:
+                    type: string
+                    format: date-time
+                  channel:
+                    type: integer
+                    format: int32
+                  rssi:
+                    type: integer
+                    format: int32
+                  snr:
+                    type: number
+        downlink_url:
+          type: string
