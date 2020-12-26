@@ -9,16 +9,6 @@ pool: 'hetzner03'
 
 steps:
   - task: Bash@3
-    displayName: Prepare
-    inputs:
-      targetType: 'inline'
-      script: |
-        kubectl cluster-info
-        cd $(Build.SourcesDirectory)/frontend
-        npm i
-        npm run build
-
-  - task: Bash@3
     displayName: Prepare dockerfile for image
     inputs:
       targetType: 'inline'
@@ -33,6 +23,16 @@ steps:
       command: buildAndPush
       dockerfile: '$(Build.SourcesDirectory)/target/docker/stage/Dockerfile'
       tags: $(Build.BuildNumber)
+
+  - task: Bash@3
+    displayName: Prepare
+    inputs:
+      targetType: 'inline'
+      script: |
+        kubectl cluster-info
+        cd $(Build.SourcesDirectory)/frontend
+        npm i
+        npm run build
 
   - task: Bash@3
     displayName: Deploy site
