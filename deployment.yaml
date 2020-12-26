@@ -88,8 +88,10 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: catracker-service
-              servicePort: 8080
+              service:
+                name: catracker-service
+                port:
+                  number: 8080
   tls:
     - hosts:
         - catracker-demo.pragmasoft.nl
