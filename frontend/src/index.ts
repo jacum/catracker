@@ -30,7 +30,8 @@ interface DevicePath {
 
 interface Position {
   latitude: number,
-  longitude: number
+  longitude: number,
+  time: string
 }
 
  api<DevicePath>('/paths.json')
