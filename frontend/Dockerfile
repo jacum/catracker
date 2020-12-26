@@ -1,4 +1,4 @@
 FROM eblovich/http
-COPY frontend/public /files
+COPY /public /files
 COPY nginx.conf /etc/nginx/nginx.conf
 
