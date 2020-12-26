@@ -33,19 +33,20 @@ interface Position {
   longitude: number
 }
 
- api<DevicePath>('/api/catracker/paths/58A0CB0000204688')
+ api<DevicePath>('https://catracker-demo.pragmasoft.nl/api/catracker/paths/58A0CB0000204688')
   .then(
-     data =>{
-      if (data.positions) {
-        new google.maps.Marker({
+     data => data.positions.map(
+     (p: Position) => {
+        new google.maps.Marker( {
           position: {
-            lat: data.positions[0].latitude,
-            lng: data.positions[0].longitude,
+            lat: p.latitude,
+            lng: p.longitude,
           },
           map: map,
-          title: "Last"});
-      }
-    });
+          title: "Last"
+          } );
+
+        }));
 
 }
 export { initMap };
