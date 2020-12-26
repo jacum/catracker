@@ -33,7 +33,7 @@ interface Position {
   longitude: number
 }
 
- api<DevicePath>('https://catracker-demo.pragmasoft.nl/api/catracker/paths/58A0CB0000204688')
+ api<DevicePath>('/paths.json')
   .then(
      data => data.positions.map(
      (p: Position) => {
@@ -43,7 +43,7 @@ interface Position {
             lng: p.longitude,
           },
           map: map,
-          title: "Last"
+          label: p.time,
           } );
 
         }));

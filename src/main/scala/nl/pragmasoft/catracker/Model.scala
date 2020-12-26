@@ -1,10 +1,12 @@
 package nl.pragmasoft.catracker
 
+import java.sql.Timestamp
+
 object Model {
 
   case class StoredPosition(
     id: Long = 0L,
-    recorded: java.time.Instant,
+    recorded: Timestamp,
     app: String,
     deviceType: String,
     deviceSerial: String,
