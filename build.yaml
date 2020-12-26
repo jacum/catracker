@@ -9,6 +9,26 @@ pool: 'hetzner03'
 
 steps:
   - task: Bash@3
+    displayName: Prepare
+    inputs:
+      targetType: 'inline'
+      script: |
+        kubectl cluster-info
+        cd $(Build.SourcesDirectory)/frontend
+        npm i
+        npm run build
+
+  - task: Docker@2
+    displayName: Build the image
+    inputs:
+      workingDirectory: $(Build.SourcesDirectory)/frontend
+      repository: eblovich/catracker-http
+      command: buildAndPush
+      addPipelineData: false
+      dockerfile: '$(Build.SourcesDirectory)/frontend/Dockerfile'
+      tags: $(Build.BuildNumber)
+
+  - task: Bash@3
     displayName: Prepare dockerfile for image
     inputs:
       targetType: 'inline'
@@ -19,21 +39,11 @@ steps:
     displayName: Build the image
     inputs:
       workingDirectory: $(Build.SourcesDirectory)
-      repository: eblovich/catracker
+      repository: eblovich/catracker-service
       command: buildAndPush
       addPipelineData: false
       dockerfile: '$(Build.SourcesDirectory)/target/docker/stage/Dockerfile'
       tags: $(Build.BuildNumber)
-
-  - task: Bash@3
-    displayName: Prepare
-    inputs:
-      targetType: 'inline'
-      script: |
-        kubectl cluster-info
-        cd $(Build.SourcesDirectory)/frontend
-        npm i
-        npm run build
 
   - task: Bash@3
     displayName: Deploy site

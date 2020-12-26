@@ -16,7 +16,7 @@ spec:
       containers:
         - name: http
           imagePullPolicy: Always
-          image: eblovich/http
+          image: eblovich/catracker-http:APP_VERSION
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
@@ -33,7 +33,7 @@ spec:
               name: cache-http
         - name: app
           imagePullPolicy: Always
-          image: eblovich/catracker:APP_VERSION
+          image: eblovich/catracker-service:APP_VERSION
           env:
 #            - name: DATABASE_PASSWORD
 #              valueFrom:
@@ -74,7 +74,7 @@ spec:
       targetPort: 8080
       port: 8080
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: catracker-ingress
@@ -89,7 +89,7 @@ spec:
         paths:
           - backend:
               serviceName: catracker-service
-              servicePort: 8081
+              servicePort: 8080
   tls:
     - hosts:
         - catracker-demo.pragmasoft.nl
