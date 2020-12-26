@@ -3,15 +3,15 @@ kind: Deployment
 metadata:
   name: catracker
   labels:
-    uri: catracker-demo.jacum.com
+    uri: catracker-demo.pragmasoft.nl
 spec:
   selector:
     matchLabels:
-      uri: catracker-demo.jacum.com
+      uri: catracker-demo.pragmasoft.nl
   template:
     metadata:
       labels:
-        uri: catracker-demo.jacum.com
+        uri: catracker-demo.pragmasoft.nl
     spec:
       containers:
         - name: http
@@ -66,7 +66,7 @@ metadata:
   name: catracker-service
 spec:
   selector:
-    uri: catracker-demo.jacum.com
+    uri: catracker-demo.pragmasoft.nl
   type: ClusterIP
   ports:
     - name: http
@@ -92,7 +92,7 @@ spec:
               servicePort: 8081
   tls:
     - hosts:
-        - catracker-demo.jacum.com
+        - catracker-demo.pragmasoft.nl
       secretName:  catracker-tls
 #---
 #apiVersion: v1
