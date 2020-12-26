@@ -62,7 +62,7 @@ val `root` = project.in(file("."))
       "org.http4s" %% "http4s-dsl" % http4sVersion,
       "org.http4s" %% "http4s-prometheus-metrics" % http4sVersion,
       "com.h2database" % "h2" % h2Version,
-
+      "mysql" % "mysql-connector-java" % "5.1.12",
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,

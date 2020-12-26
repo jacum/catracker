@@ -35,11 +35,11 @@ spec:
           imagePullPolicy: Always
           image: eblovich/catracker-service:APP_VERSION
           env:
-#            - name: DATABASE_PASSWORD
-#              valueFrom:
-#                secretKeyRef:
-#                  name: catracker-secrets
-#                  key: DATABASE_PASSWORD
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: catracker-secrets
+                  key: DATABASE_PASSWORD
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
