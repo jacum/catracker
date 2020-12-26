@@ -87,7 +87,9 @@ spec:
     - host: catracker-demo.pragmasoft.nl
       http:
         paths:
-          - backend:
+          - path: /
+            pathType: Prefix
+            backend:
               service:
                 name: catracker-service
                 port:
