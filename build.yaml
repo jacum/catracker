@@ -21,6 +21,7 @@ steps:
       workingDirectory: $(Build.SourcesDirectory)
       repository: eblovich/catracker
       command: buildAndPush
+      addPipelineData: false
       dockerfile: '$(Build.SourcesDirectory)/target/docker/stage/Dockerfile'
       tags: $(Build.BuildNumber)
 
@@ -39,4 +40,4 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        kubectl apply -f deployment.yaml
+        cat deployment.yaml | sed "s#APP_VERSION#$(Build.BuildNumber)#g" | kubectl apply -f -
