@@ -34,21 +34,27 @@ interface Position {
   time: string
 }
 
- api<DevicePath>('/paths.json')
+api<DevicePath>('/api/catracker/paths/58A0CB0000204688')
   .then(
-     data => data.positions.map(
-     (p: Position) => {
-        new google.maps.Marker( {
-          position: {
-            lat: p.latitude,
-            lng: p.longitude,
-          },
-          map: map,
-          label: p.time,
-          } );
+     data => {
+      new google.maps.Polyline({
+           path: data.positions.map( (p: Position) => new google.maps.LatLng({ lat: p.latitude, lng: p.longitude }) ),
+           geodesic: true,
+           strokeColor: "#FF0000",
+           strokeOpacity: 1.0,
+           strokeWeight: 2,
+           map: map
+         });
 
-        }));
-
+       new google.maps.Marker( {
+             position: {
+               lat: data.positions[0].latitude,
+               lng: data.positions[0].longitude,
+             },
+             map: map
+             } );
+     }
+  );
 }
 export { initMap };
 
