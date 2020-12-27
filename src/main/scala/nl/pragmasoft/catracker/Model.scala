@@ -6,7 +6,7 @@ object Model {
 
   case class StoredPosition(
     id: Long = 0L,
-    recorded: Timestamp,
+    recorded: Long,
     app: String,
     deviceType: String,
     deviceSerial: String,

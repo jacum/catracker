@@ -20,7 +20,7 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F]) extends Ha
         positions = pathPositions
           .distinctBy(_.recorded)
           .map( p => DevicePath.Positions(p.latitude.doubleValue, p.longitude.doubleValue,
-            Instant.ofEpochMilli(p.recorded.toEpochMilli).atOffset(ZoneOffset.UTC))
+            Instant.ofEpochMilli(p.recorded).atOffset(ZoneOffset.UTC))
         ).toVector
       )
     )
@@ -32,7 +32,7 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F]) extends Ha
     for {
       _ <- positions.add(
         StoredPosition(
-          recorded = gw.time.toInstant,
+          recorded = gw.time.toInstant.toEpochMilli,
           app = e.appId,
           deviceType = e.devId,
           deviceSerial = e.hardwareSerial,

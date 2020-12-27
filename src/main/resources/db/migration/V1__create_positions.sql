@@ -1,6 +1,6 @@
 CREATE TABLE positions (
   `id` SERIAL PRIMARY KEY,
-  `recorded` datetime not null,
+  `recorded` int(11) not null,
   `latitude` double NOT NULL DEFAULT 0,
   `longitude` double NOT NULL DEFAULT 0,
   `battery` int(11) NOT NULL,
