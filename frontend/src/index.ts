@@ -1,6 +1,3 @@
-// import myData from 'data.json';
-
-// Implementation code where T is the returned data shape
 function api<T>(url: string): Promise<T> {
   return fetch(url)
     .then(response => {
@@ -10,6 +7,14 @@ function api<T>(url: string): Promise<T> {
       return response.json();
     })
 
+}
+
+function timeAgo(d: number) {
+  const diffMs = ((new Date()).getTime() - d);
+  const diffDays = Math.floor(diffMs / 86400000); // days
+  const diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+  const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+  return (diffDays > 0 ? diffDays + "d " : "") + diffHrs + "h " + diffMins + "m";
 }
 
 function initMap(): void {
@@ -34,7 +39,10 @@ interface Position {
   time: string
 }
 
-api<DevicePath>('/api/catracker/paths/58A0CB0000204688')
+const device = window.location.pathname.split("/")[1];
+
+// api<DevicePath>('/paths.json')
+api<DevicePath>('/api/catracker/paths/' + device)
   .then(
      data => {
       new google.maps.Polyline({
@@ -45,12 +53,13 @@ api<DevicePath>('/api/catracker/paths/58A0CB0000204688')
            strokeWeight: 2,
            map: map
          });
-
+       const last = data.positions[0];
        new google.maps.Marker( {
              position: {
-               lat: data.positions[0].latitude,
-               lng: data.positions[0].longitude,
+               lat: last.latitude,
+               lng: last.longitude,
              },
+             label: device + ": " + timeAgo(Date.parse(last.time)),
              map: map
              } );
      }
@@ -58,4 +67,4 @@ api<DevicePath>('/api/catracker/paths/58A0CB0000204688')
 }
 export { initMap };
 
-import "./style.css"; // required for webpack
+import "./style.css";

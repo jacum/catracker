@@ -1,0 +1,37 @@
+{
+  "app_id": "pragma_cats_dragino",
+  "dev_id": "dragino_test1",
+  "hardware_serial": "A840416B61826E5F",
+  "port": 2,
+  "counter": 93,
+  "payload_raw": "Ax6FtABLdC0OZWM=",
+  "payload_fields": {
+    "accuracy": 0,
+    "capacity": 0,
+    "latitude": 52.331956,
+    "longitude": 4.944941,
+    "port": 2,
+    "temperature": 0,
+    "voltage": 3.685,
+    "gnss_fix": 1
+  },
+  "metadata": {
+    "time": "2020-12-28T11:36:17.269018381Z",
+    "frequency": 868.1,
+    "modulation": "LORA",
+    "data_rate": "SF7BW125",
+    "coding_rate": "4/5",
+    "gateways": [
+      {
+        "gtw_id": "eui-58a0cbfffe802a34",
+        "timestamp": 13398483,
+        "time": "2020-12-28T11:36:17.480709075Z",
+        "channel": 0,
+        "rssi": -87,
+        "snr": 9.75,
+        "rf_chain": 0
+      }
+    ]
+  },
+  "downlink_url": "https://integrations.thethingsnetwork.org/ttn-eu/api/v2/down/pragma_cats_dragino/catracker?key=ttn-account-v2.q3vCLU1Une4Z7lxiSy3P1ZG8cBfaxQB66AbnL02aHNg"
+}
