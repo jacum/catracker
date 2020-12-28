@@ -40,8 +40,6 @@ interface Position {
 }
 
 const device = window.location.pathname.split("/")[1];
-
-// api<DevicePath>('/paths.json')
 api<DevicePath>('/api/catracker/paths/' + device)
   .then(
      data => {
