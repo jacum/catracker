@@ -1,7 +1,5 @@
 package nl.pragmasoft.catracker
 
-import java.sql.Timestamp
-
 object Model {
 
   case class StoredPosition(
