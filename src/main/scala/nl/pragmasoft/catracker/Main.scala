@@ -21,8 +21,8 @@ object Main extends IOApp with LazyLogging {
 
   override def run(args: List[String]): IO[ExitCode] = {
     val config                                      = ConfigFactory.load()
-//    implicit val system: ActorSystem                = ActorSystem("app", config)
-    implicit val executionContext: ExecutionContext = ExecutionContext.global
+    implicit val system: ActorSystem                = ActorSystem("app", config)
+    implicit val executionContext: ExecutionContext = system.dispatcher
 
     val apiLoggingAction: Option[String => IO[Unit]] = {
       val apiLogger = LoggerFactory.getLogger("HTTP")

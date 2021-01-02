@@ -48,9 +48,9 @@ spec:
             - containerPort: 8081
           resources:
             limits:
-              memory: 128Mi
+              memory: 1G
             requests:
-              memory: 128Mi
+              memory: 512Mi
       volumes:
         - name: cache
           emptyDir: {}

@@ -33,7 +33,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        docker run -u 1000:1002 -i --log-driver=none -a stdin -a stdout -a stderr -e COURSIER_CACHE=/cache/coursier  -v /usr/bin/docker:/sbin/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(Build.SourcesDirectory):/root: -v /data/cache/agent:/cache --rm hseeberger/scala-sbt:graalvm-ce-20.3.0-java11_1.4.6_2.12.12 sbt   -Dsbt.global.base=/cache/.sbt -Dsbt.boot.directory=/cache/.sbt -Divy.home=/cache/.ivy2 -Dsbt.ivy.home=/cache/.ivy2 nativeImage
+        docker run -u 1000:1002 -i --log-driver=none -a stdin -a stdout -a stderr -e COURSIER_CACHE=/cache/coursier  -v /usr/bin/docker:/sbin/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(Build.SourcesDirectory):/root: -v /data/cache/agent:/cache --rm hseeberger/scala-sbt:graalvm-ce-20.0.0-java11_1.3.13_2.13.3 sbt   -Dsbt.global.base=/cache/.sbt -Dsbt.boot.directory=/cache/.sbt -Divy.home=/cache/.ivy2 -Dsbt.ivy.home=/cache/.ivy2 compile docker:stage
 
   - task: Docker@2
     displayName: Build the image
@@ -42,7 +42,7 @@ steps:
       repository: eblovich/catracker-service
       command: buildAndPush
       addPipelineData: false
-      dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+      dockerfile: '$(Build.SourcesDirectory)/target/docker/stage/Dockerfile'
       tags: $(Build.BuildNumber)
 
   - task: Bash@3

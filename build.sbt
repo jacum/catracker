@@ -21,8 +21,6 @@ val `root` = project.in(file("."))
   .enablePlugins(GuardrailPlugin)
   .enablePlugins(WartRemover)
   .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .enablePlugins(NativeImagePlugin)
-//  .enablePlugins(GraalVMNativeImagePlugin)
   .settings(organization := "nl.pragmasoft.catracker",
     scalaVersion := "2.13.3",
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
@@ -40,24 +38,6 @@ val `root` = project.in(file("."))
       "-feature",
       "-Xfatal-warnings"
     ),
-//    graalVMNativeImageOptions ++= Seq(
-    nativeImageOptions ++= Seq(
-      "--report-unsupported-elements-at-runtime",
-      "-H:+ReportExceptionStackTraces",
-      "--verbose",
-      "--allow-incomplete-classpath",
-      "-Dio.netty.noUnsafe=true",
-      "--no-fallback",
-      "-H:+AddAllCharsets",
-      s"-H:ConfigurationFileDirectories=${baseDirectory.in(ThisBuild).value}/graalvm-conf/",
-      "--enable-all-security-services",
-      "--enable-url-protocols=https",
-      "-H:Log=registerResource:",
-      "-H:IncludeResources=.*",
-      "-H:EnableURLProtocols=http",
-      "--initialize-at-build-time",
-      "--initialize-at-run-time=org.h2.store.fs.FileNioMemData,org.flywaydb.core.internal.scanner.classpath.jboss.JBossVFSv3ClassPathLocationScanner,io.netty.handler.ssl.util.BouncyCastleSelfSignedCertGenerator,io.netty.handler.ssl.ReferenceCountedOpenSslClientContext,io.netty.handler.ssl.ReferenceCountedOpenSslServerContext,io.netty.handler.ssl.JdkNpnApplicationProtocolNegotiator,io.netty.handler.ssl.JdkAlpnApplicationProtocolNegotiator,io.netty.handler.ssl.util.ThreadLocalInsecureRandom,io.netty.handler.ssl.JettyNpnSslEngine,io.netty.handler.ssl.ReferenceCountedOpenSslEngine,io.netty.handler.ssl.ConscryptAlpnSslEngine,io.netty.handler.ssl.JettyAlpnSslEngine$ClientEngine,io.netty.handler.ssl.JettyAlpnSslEngine$ServerEngine,io.netty.util.internal.ObjectCleaner,io.netty.handler.ssl.util.InsecureTrustManagerFactory"
-    ),
     packageOptions in(Compile, packageBin) +=
       Package.ManifestAttributes(
         "Build-Time" -> new java.util.Date().toString,
@@ -73,12 +53,6 @@ val `root` = project.in(file("."))
         framework = "http4s",
         tracing = false)
     ),
-    assemblyMergeStrategy in assembly := {
-      case PathList("reference.conf") => MergeStrategy.concat
-      case x =>
-        val oldStrategy = (assemblyMergeStrategy in assembly).value
-        oldStrategy(x)
-    },
     libraryDependencies ++= Seq(
       compilerPlugin("org.typelevel" % "kind-projector_2.13.1" % kindProjectorVersion),
 
