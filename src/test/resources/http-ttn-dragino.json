@@ -13,7 +13,7 @@
     "port": 2,
     "temperature": 0,
     "voltage": 3.685,
-    "gnss_fix": 1
+    "gnss_fix": false
   },
   "metadata": {
     "time": "2020-12-28T11:36:17.269018381Z",

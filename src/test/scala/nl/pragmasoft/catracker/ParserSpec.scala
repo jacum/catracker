@@ -60,14 +60,14 @@ class ParserSpec extends AnyWordSpec with MockFactory with Matchers {
         parse(
           Source.fromResource("http-ttn-dragino.json").getLines().mkString("\n")
         ).left.map(f => fail(s"can't parse: $f")).merge
-      ) shouldBe Right(
-        Right(TtnEvent("pragma_cats_tabs","tabs_test1","58A0CB0000204688",85,
-          TtnEvent.PayloadFields(16,93.33333333333333,false,52.331984,4.944248,Some(136),18,3.9),
-          TtnEvent.Metadata( LocalDateTime.parse("2020-12-25T12:07:49.102008218Z,868.5").atOffset(ZoneOffset.UTC),
-            868.5, "LORA","SF12BW125","4/5",
-            Vector(TtnEvent.Metadata.Gateways("eui-58a0cbfffe802a34","2020-12-25T12:07:49.168767929Z").atOffset(ZoneOffset.UTC),0,-68,6.5))),
-          Some("https://integrations.thethingsnetwork.org/ttn-eu/api/v2/down/pragma_cats_tabs/requestbin?key=ttn-account-v2.yG7tTCBkMQ8Ktg35n6rBsiUEGPIWLdf36mW_v_Mfwp8")))
-      )
+      ) shouldBe
+        Right(TtnEvent("pragma_cats_dragino","dragino_test1","A840416B61826E5F",93,
+          TtnEvent.PayloadFields(0,0,false,52.331956,4.944941,Some(2),0,3.685),
+          TtnEvent.Metadata(LocalDateTime.parse("2020-12-28T11:36:17.269018381Z", ISO_DATE_TIME).atOffset(ZoneOffset.UTC),868.1,
+            "LORA","SF7BW125","4/5",
+          Vector(TtnEvent.Metadata.Gateways("eui-58a0cbfffe802a34",
+            LocalDateTime.parse("2020-12-28T11:36:17.480709075Z", ISO_DATE_TIME).atOffset(ZoneOffset.UTC),0,-87,9.75))),
+      Some("https://integrations.thethingsnetwork.org/ttn-eu/api/v2/down/pragma_cats_dragino/catracker?key=ttn-account-v2.q3vCLU1Une4Z7lxiSy3P1ZG8cBfaxQB66AbnL02aHNg")))
     }
   }
 
