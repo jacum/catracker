@@ -46,7 +46,7 @@ class PositionDatabase(transactor: Transactor[IO]) extends PositionRepository[IO
       .map(_ => ())
 
   def findForDevice(deviceSerial: String): IO[List[StoredPosition]] =
-    sql"SELECT id, recorded, app, deviceType, deviceSerial, latitude, longitude, positionFix, bestGateway, bestSNR, battery, temperature, counter FROM positions WHERE deviceSerial=$deviceSerial and positionFix=1 and latitude<>0 and longitude<>0 order by recorded desc"
+    sql"SELECT id, recorded, app, deviceType, deviceSerial, latitude, longitude, positionFix, bestGateway, bestSNR, battery, temperature, counter FROM positions WHERE deviceSerial=$deviceSerial and positionFix=1 and latitude<>0 and longitude<>0 order by recorded desc limit 10"
       .query[StoredPosition]
       .to[List]
       .transact(transactor)
