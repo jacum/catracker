@@ -62,10 +62,20 @@ function redraw(map: google.maps.Map, data: DevicePath, lastSeen: string): void 
 function initMap(): void {
 
   const device = window.location.pathname.split("/")[1];
-  const host = "http://localhost:8081"
+  const location = window.location;
 
+  var wsUrl: string;
+  if (location.protocol === "https:") {
+      wsUrl = "wss:";
+  } else {
+      wsUrl = "ws:";
+  }
+  const host = location.host;  // for local dev: "localhost:8081"
 
-  api<DevicePath>(host + '/api/catracker/paths/' + device)
+  wsUrl += "//" + location.host + "/api/catracker/ws/" + device + "/" + uuidv4();
+  const dataUrl = location.protocol + "//" + host + '/api/catracker/paths/' + device;
+  console.log(dataUrl);
+  api<DevicePath>(dataUrl)
     .then(
        data => {
           const map = new google.maps.Map(
@@ -74,7 +84,8 @@ function initMap(): void {
           );
           currentData = data;
           redraw(map, currentData, data.lastSeen);
-          const ws = new WebsocketBuilder('ws://localhost:8081/api/catracker/ws/' + device + "/" + uuidv4())
+
+          const ws = new WebsocketBuilder(wsUrl)
                 .onOpen((i, ev) => { console.log("opened") })
                 .onClose((i, ev) => { console.log("closed") })
                 .onError((i, ev) => { console.log("error") })
