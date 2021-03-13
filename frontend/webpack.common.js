@@ -40,6 +40,14 @@ module.exports = {
         exclude: /node_modules/,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
+      {
+        test: /\.png$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      }
     ],
   },
   resolve: {
@@ -47,8 +55,8 @@ module.exports = {
   },
   output: {
     path: `${__dirname}/public`,
-    publicPath: "/",
-    filename: "index.js",
+    filename: 'app.bundle.js',
+    publicPath: `${__dirname}/public`,
     library: "",
     libraryTarget: "window",
   },

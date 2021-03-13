@@ -1,3 +1,18 @@
+import marker from './marker.png'
+import {WebsocketBuilder} from 'websocket-ts';
+import {v4 as uuidv4} from 'uuid';
+
+interface DevicePath {
+  description: string,
+  lastSeen: string,
+  positions: Array<Position>
+}
+
+interface Position {
+  latitude: number;
+  longitude: number;
+}
+
 function api<T>(url: string): Promise<T> {
   return fetch(url)
     .then(response => {
@@ -6,62 +21,77 @@ function api<T>(url: string): Promise<T> {
       }
       return response.json();
     })
-
 }
 
-function timeAgo(d: number) {
-  const diffMs = ((new Date()).getTime() - d);
-  const diffDays = Math.floor(diffMs / 86400000); // days
-  const diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
-  const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
-  return (diffDays > 0 ? diffDays + "d " : "") + diffHrs + "h " + diffMins + "m";
+export function forceCast<T>(input: any): T {
+  return input;
+}
+
+var currentData: DevicePath
+var currentMarker:  google.maps.Marker
+var currentPath:  google.maps.Polyline
+
+
+function redraw(map: google.maps.Map, data: DevicePath, lastSeen: string): void {
+  const last = data.positions[0];
+  map.setCenter({ lat: last.latitude, lng: last.longitude});
+  currentPath = new google.maps.Polyline({
+       path: data.positions.map( (p: Position) => new google.maps.LatLng({ lat: p.latitude, lng: p.longitude }) ),
+       geodesic: true,
+       strokeColor: "#FF0000",
+       strokeOpacity: 1.0,
+       strokeWeight: 6,
+       map: map
+     });
+   currentMarker = new google.maps.Marker( {
+         position: {
+           lat: last.latitude,
+           lng: last.longitude,
+         },
+         opacity: 1,
+         label: {
+           text: lastSeen,
+           fontSize: "40px"
+         },
+         icon: {url: marker, labelOrigin: new google.maps.Point(40,90) },
+         map: map
+         }
+       );
 }
 
 function initMap(): void {
-  const center = { lat: 52.331984, lng: 4.944248 };
 
-  const map = new google.maps.Map(
-    document.getElementById("map") as HTMLElement,
-    {
-      zoom: 16,
-      center: center,
-    }
-  );
+  const device = window.location.pathname.split("/")[1];
+  const host = "http://localhost:8081"
 
-interface DevicePath {
-  description: string,
-  positions: Array<Position>
-}
 
-interface Position {
-  latitude: number,
-  longitude: number,
-  time: string
-}
+  api<DevicePath>(host + '/api/catracker/paths/' + device)
+    .then(
+       data => {
+          const map = new google.maps.Map(
+           document.getElementById("map") as HTMLElement,
+           {  zoom: 18 }
+          );
+          currentData = data;
+          redraw(map, currentData, data.lastSeen);
+          const ws = new WebsocketBuilder('ws://localhost:8081/api/catracker/ws/' + device + "/" + uuidv4())
+                .onOpen((i, ev) => { console.log("opened") })
+                .onClose((i, ev) => { console.log("closed") })
+                .onError((i, ev) => { console.log("error") })
+                .onMessage((i, ev) => {
+                  if (ev.data != "") { // initial frame
+                    let position: Position = forceCast<Position>(JSON.parse(ev.data));
+                    currentData.positions.unshift(position);
+                    currentMarker.setMap(null);
+                    currentPath.setMap(null);
+                    redraw(map, currentData, "Now");
+                  }
+                })
+                .onRetry((i, ev) => { console.log("retry") })
+                .build();
 
-const device = window.location.pathname.split("/")[1];
-api<DevicePath>('/api/catracker/paths/' + device)
-  .then(
-     data => {
-      new google.maps.Polyline({
-           path: data.positions.map( (p: Position) => new google.maps.LatLng({ lat: p.latitude, lng: p.longitude }) ),
-           geodesic: true,
-           strokeColor: "#FF0000",
-           strokeOpacity: 1.0,
-           strokeWeight: 2,
-           map: map
-         });
-       const last = data.positions[0];
-       new google.maps.Marker( {
-             position: {
-               lat: last.latitude,
-               lng: last.longitude,
-             },
-             label: device + ": " + timeAgo(Date.parse(last.time)),
-             map: map
-             } );
-     }
-  );
+       }
+    );
 }
 export { initMap };
 
