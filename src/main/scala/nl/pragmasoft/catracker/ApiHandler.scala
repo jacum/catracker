@@ -8,7 +8,7 @@ import nl.pragmasoft.catracker.Model.{PositionRepository, StoredPosition}
 import nl.pragmasoft.catracker.http.definitions.{DevicePath, TtnEvent}
 import nl.pragmasoft.catracker.http.{Handler, IncomingEventResponse, PathForDeviceResponse}
 
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 

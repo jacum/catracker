@@ -1,17 +1,16 @@
 package nl.pragmasoft.catracker
 
-import cats.effect.{Async, ExitCode, IO, IOApp, Timer}
+import cats.effect.{Async, ExitCode, IO, IOApp}
+import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
-import nl.pragmasoft.catracker.http.client.Client
+import nl.pragmasoft.catracker.http.client.{Client, IncomingEventResponse}
 import nl.pragmasoft.catracker.http.client.definitions.TtnEvent
 import org.http4s.client.blaze.BlazeClientBuilder
 
-import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 import java.time.{LocalDateTime, ZoneOffset}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
-import cats.implicits._
 
 object MainTrackerSimulator extends IOApp with LazyLogging {
 
@@ -19,8 +18,8 @@ object MainTrackerSimulator extends IOApp with LazyLogging {
 
     BlazeClientBuilder[IO](ExecutionContext.global).resource.use { client =>
       val ttnPoster = new Client[IO]("http://localhost:8081/api/catracker") (implicitly[Async[IO]], client)
-      def send = ttnPoster.incomingEvent(createTtnEvent)
-      def repeat: IO[Unit] = send >> timer.sleep(10 seconds) >> repeat
+      def send: IO[IncomingEventResponse] = ttnPoster.incomingEvent(createTtnEvent)
+      def repeat: IO[Unit] = send >> timer.sleep(65 seconds) >> repeat
       repeat
     } .as(ExitCode.Success)
 

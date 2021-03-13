@@ -1,4 +1,3 @@
-import marker from './marker.png'
 import {WebsocketBuilder} from 'websocket-ts';
 import {v4 as uuidv4} from 'uuid';
 
@@ -40,7 +39,7 @@ function redraw(map: google.maps.Map, data: DevicePath, lastSeen: string): void 
        geodesic: true,
        strokeColor: "#FF0000",
        strokeOpacity: 1.0,
-       strokeWeight: 6,
+       strokeWeight: 5,
        map: map
      });
    currentMarker = new google.maps.Marker( {
@@ -53,7 +52,7 @@ function redraw(map: google.maps.Map, data: DevicePath, lastSeen: string): void 
            text: lastSeen,
            fontSize: "40px"
          },
-         icon: {url: marker, labelOrigin: new google.maps.Point(40,90) },
+         icon: {url: "/marker.png", labelOrigin: new google.maps.Point(40,90) },
          map: map
          }
        );
@@ -70,9 +69,10 @@ function initMap(): void {
   } else {
       wsUrl = "ws:";
   }
-  const host = location.host;  // for local dev: "localhost:8081"
+  const host = location.host;
+//   const host = "localhost:8081";
 
-  wsUrl += "//" + location.host + "/api/catracker/ws/" + device + "/" + uuidv4();
+  wsUrl += "//" + host + "/api/catracker/ws/" + device + "/" + uuidv4();
   const dataUrl = location.protocol + "//" + host + '/api/catracker/paths/' + device;
   console.log(dataUrl);
   api<DevicePath>(dataUrl)
@@ -95,7 +95,7 @@ function initMap(): void {
                     currentData.positions.unshift(position);
                     currentMarker.setMap(null);
                     currentPath.setMap(null);
-                    redraw(map, currentData, "Now");
+                    redraw(map, currentData, "~");
                   }
                 })
                 .onRetry((i, ev) => { console.log("retry") })

@@ -4,9 +4,9 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior, RetentionCriteria}
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
-import cats.effect.{Concurrent, IO}
+import cats.effect.{Concurrent, IO, Timer}
 import com.typesafe.scalalogging.LazyLogging
-import io.circe.Encoder._
+import cats.implicits._
 import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
@@ -16,7 +16,7 @@ import nl.pragmasoft.catracker.Model.StoredPosition
 import nl.pragmasoft.catracker.Trackers.StateUpdated
 import nl.pragmasoft.catracker.http.definitions.DevicePath.Positions
 import org.http4s.websocket.WebSocketFrame
-import org.http4s.websocket.WebSocketFrame.Text
+import org.http4s.websocket.WebSocketFrame.{Ping, Text}
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration.DurationInt
@@ -24,15 +24,19 @@ import scala.concurrent.duration.DurationInt
 object Trackers extends LazyLogging {
   implicit val positionEncoder: Encoder[Positions] = deriveEncoder[Positions]
 
-  def streamUpdates(device: DeviceId, connectionId: ConnectionId)(implicit concurrent: Concurrent[IO]): Stream[IO, WebSocketFrame] = {
+  def connect(deviceId: DeviceId, connectionId: ConnectionId)(implicit concurrent: Concurrent[IO]): Stream[IO, WebSocketFrame] = {
+    logger.info(s"$deviceId $connectionId: connected")
     activeConnections
-      .getOrElseUpdate(device, TrieMap.empty)
+      .getOrElseUpdate(deviceId, TrieMap.empty)
       .getOrElseUpdate(connectionId, Topic[IO, WebSocketFrame](Text("")).unsafeRunSync())
       .subscribe(10)
   }
 
   def disconnect(deviceId: DeviceId, connectionId: ConnectionId): IO[Unit] =
-    IO(activeConnections.get(deviceId).foreach(_.remove(connectionId)))
+    IO {
+      activeConnections.get(deviceId).foreach(_.remove(connectionId))
+      logger.info(s"$deviceId $connectionId: disconnected")
+    }
 
   sealed trait Command
   final case class UpdatePosition(storedPosition: StoredPosition) extends Command
@@ -41,8 +45,12 @@ object Trackers extends LazyLogging {
   private val activeConnections: TrieMap[DeviceId, TrieMap[ConnectionId, Topic[IO, WebSocketFrame]]] = TrieMap.empty
   private val activeDevices: TrieMap[DeviceId, ActorRef[Tracker.Command]] = TrieMap.empty
 
-  def apply(): Behavior[Command] =
+  def apply(timer: Timer[IO]): Behavior[Command] =
     Behaviors.setup { context =>
+
+      def ping: IO[Unit] = IO(activeConnections.foreach(_._2.foreach(_._2.publish1(Ping()))))
+      def repeat: IO[Unit] = ping >> timer.sleep(10 seconds) >> repeat
+      repeat.unsafeRunAsyncAndForget()
 
       def tracker(device: DeviceId): ActorRef[Tracker.Command] =
         activeDevices.getOrElseUpdate(device,
