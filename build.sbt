@@ -9,10 +9,10 @@ val kindProjectorVersion = "0.11.0"
 val enumeratumCirceVersion = "1.6.1"
 val circeVersion = "0.13.0"
 val ficusVersion = "1.5.0"
-val akkaVersion = "2.6.10"
+val akkaVersion = "2.6.13"
 val doobieVersion = "0.9.0"
 val pureConfigVersion = "0.12.3"
-val flywayVersion = "6.3.1"
+val flywayVersion = "7.7.0"
 val scalaTestVersion = "3.1.1"
 val scalaMockVersion = "4.4.0"
 val h2Version = "1.4.200"
@@ -21,7 +21,9 @@ val `root` = project.in(file("."))
   .enablePlugins(GuardrailPlugin)
   .enablePlugins(WartRemover)
   .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(organization := "nl.pragmasoft.catracker",
+  .settings(
+    name := "catracker",
+    organization := "nl.pragmasoft.catracker",
     scalaVersion := "2.13.3",
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
     dockerBaseImage := "openjdk:11",
@@ -51,25 +53,40 @@ val `root` = project.in(file("."))
         file("api.yaml"),
         pkg = "nl.pragmasoft.catracker.http",
         framework = "http4s",
-        tracing = false)
+        tracing = false),
+      ScalaClient(
+        file("api.yaml"),
+        pkg = "nl.pragmasoft.catracker.http.client",
+        framework = "http4s",
+        tracing = false
+      )
     ),
     libraryDependencies ++= Seq(
       compilerPlugin("org.typelevel" % "kind-projector_2.13.1" % kindProjectorVersion),
-
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
       "org.http4s" %% "http4s-blaze-client" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
       "org.http4s" %% "http4s-dsl" % http4sVersion,
       "org.http4s" %% "http4s-prometheus-metrics" % http4sVersion,
       "com.h2database" % "h2" % h2Version,
-      "mysql" % "mysql-connector-java" % "5.1.12",
+      "mysql" % "mysql-connector-java" % "8.0.23",
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,
+      "io.circe" %% "circe-generic" % circeVersion,
+      "io.circe" %% "circe-generic-extras" % circeVersion,
       "org.flywaydb" % "flyway-core" % flywayVersion,
-      "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-      "com.typesafe.akka" %% "akka-actor" % akkaVersion
-        excludeAll ExclusionRule("org.scala-lang.modules", "scala-java8-compat_2.12"),
+
+      "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion,
+      "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
+      "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
+      "com.typesafe.akka" %% "akka-persistence-typed" % akkaVersion,
+      ("com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.2")
+      .exclude("com.typesafe.akka", "akka-actor")
+      .exclude("com.typesafe.akka", "akka-persistence")
+      .exclude("com.typesafe.akka", "akka-persistence-query")
+      .exclude("com.typesafe.akka", "akka-stream")
+      .exclude("com.typesafe.akka", "akka-protobuf"),
 
       "com.beachape" %% "enumeratum-circe" % enumeratumCirceVersion,
       "ch.qos.logback" % "logback-classic" % logbackVersion,

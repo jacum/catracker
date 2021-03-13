@@ -42,8 +42,11 @@ components:
       required:
         - description
         - positions
+        - lastSeen
       properties:
         description:
+          type: string
+        lastSeen:
           type: string
         positions:
           type: array
@@ -52,7 +55,6 @@ components:
             required:
               - latitude
               - longitude
-              - time
             properties:
               latitude:
                 type: number
@@ -60,9 +62,6 @@ components:
               longitude:
                 type: number
                 format: double
-              time:
-                type: string
-                format: date-time
     TTNEvent:
       type: object
       required:

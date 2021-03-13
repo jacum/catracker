@@ -9,7 +9,6 @@
     "watch": "webpack --config ./webpack.dev.js --mode development"
   },
   "dependencies": {
-    "react-scripts": "^4.0.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "webpack-merge": "^5.2.0"
@@ -20,7 +19,9 @@
     "@babel/runtime": "^7.12.1",
     "@types/googlemaps": "^3.40.0",
     "@types/jest": "^26.0.14",
-    "@types/webpack-env": "^1.15.3",
+    "@types/uuid": "^8.3.0",
+    "@types/webpack-env": "^1.16.0",
+    "@types/websocket": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
     "@typescript-eslint/parser": "^3.10.1",
     "babel-loader": "^8.1.0",
@@ -29,6 +30,7 @@
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^6.13.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "file-loader": "^6.2.0",
     "html-replace-webpack-plugin": "^2.5.6",
     "html-webpack-plugin": "^4.5.0",
     "jest": "^26.4.2",
@@ -38,8 +40,10 @@
     "ts-jest": "^26.4.1",
     "ts-loader": "^8.0.4",
     "typescript": "^4.0.3",
+    "uuid": "^3.4.0",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "websocket-ts": "^1.1.0"
   }
 }
