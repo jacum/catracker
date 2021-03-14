@@ -99,6 +99,7 @@ function initMap(): void {
                   }
                 })
                 .onRetry((i, ev) => { console.log("retry") })
+                .withBackoff(new ExponentialBackoff(100, 7))
                 .build();
 
        }
