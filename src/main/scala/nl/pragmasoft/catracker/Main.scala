@@ -41,6 +41,7 @@ object Main extends IOApp with LazyLogging {
         repository = new PositionDatabase(transactor)
         handler = new http.Resource[IO]().routes(new ApiHandler[IO](repository, system))
         apiService <- BlazeServerBuilder[IO](executionContext)
+          .withNio2(true)
           .bindSocketAddress(InetSocketAddress.createUnresolved("0.0.0.0", 8081))
           .withHttpApp(Logger.httpApp(logHeaders = true, logBody = true, logAction = apiLoggingAction)(Router("/api/catracker" -> (
             CORS(HttpRoutes.of[IO] {
