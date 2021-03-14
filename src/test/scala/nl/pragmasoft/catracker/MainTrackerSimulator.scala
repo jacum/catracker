@@ -19,7 +19,7 @@ object MainTrackerSimulator extends IOApp with LazyLogging {
     BlazeClientBuilder[IO](ExecutionContext.global).resource.use { client =>
       val ttnPoster = new Client[IO]("http://localhost:8081/api/catracker") (implicitly[Async[IO]], client)
       def send: IO[IncomingEventResponse] = ttnPoster.incomingEvent(createTtnEvent)
-      def repeat: IO[Unit] = send >> timer.sleep(65 seconds) >> repeat
+      def repeat: IO[Unit] = send >> timer.sleep(2 seconds) >> repeat
       repeat
     } .as(ExitCode.Success)
 

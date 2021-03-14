@@ -69,8 +69,8 @@ function initMap(): void {
   } else {
       wsUrl = "ws:";
   }
-  const host = location.host;
-//   const host = "localhost:8081";
+//   const host = location.host;
+  const host = "localhost:8081";
 
   wsUrl += "//" + host + "/api/catracker/ws/" + device + "/" + uuidv4();
   const dataUrl = location.protocol + "//" + host + '/api/catracker/paths/' + device;
@@ -91,11 +91,15 @@ function initMap(): void {
                 .onError((i, ev) => { console.log("error") })
                 .onMessage((i, ev) => {
                   if (ev.data != "") { // initial frame
-                    let position: Position = forceCast<Position>(JSON.parse(ev.data));
-                    currentData.positions.unshift(position);
-                    currentMarker.setMap(null);
-                    currentPath.setMap(null);
-                    redraw(map, currentData, "~");
+                    const json = JSON.parse(ev.data)
+                    console.log(json);
+                    if (json.hasOwnProperty("Path")) {
+                      console.log(json.Path.positions);
+                      currentData.positions = json.Path.positions;
+                      currentMarker.setMap(null);
+                      currentPath.setMap(null);
+                      redraw(map, currentData, "~");
+                    }
                   }
                 })
                 .onRetry((i, ev) => { console.log("retry") })

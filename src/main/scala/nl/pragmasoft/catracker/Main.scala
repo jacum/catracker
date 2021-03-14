@@ -23,7 +23,7 @@ object Main extends IOApp with LazyLogging {
 
   override def run(args: List[String]): IO[ExitCode] = {
     val config = ConfigFactory.load()
-    implicit val system: ActorSystem[Trackers.Command] = ActorSystem(Trackers(timer), "main", config)
+    implicit val system: ActorSystem[TrackerProtocol.Command] = ActorSystem(Trackers(timer), "main", config)
     implicit val executionContext: ExecutionContext = system.executionContext
 
     val apiLoggingAction: Option[String => IO[Unit]] = {
@@ -48,14 +48,9 @@ object Main extends IOApp with LazyLogging {
               case GET -> Root / "health" => Ok()
               case GET -> Root / "ws" / device / connectionId =>
                 WebSocketBuilder[IO].build(
-                  send = Trackers.connect(DeviceId(device), ConnectionId(connectionId)),
-                  receive = _.evalMap {
-                    case Text(t, _) => IO(println(t))
-                    case Pong(_) => IO.unit
-                    case Close(_) => IO.unit
-                    case f => IO(println(s"Unknown type: $f"))
-                  },
-                  onClose = Trackers.disconnect(DeviceId(device), ConnectionId(connectionId))
+                  send = Trackers.toClient(DeviceId(device), ConnectionId(connectionId)),
+                  receive = Trackers.fromClient(DeviceId(device), ConnectionId(connectionId)),
+                  onClose = Trackers.close(DeviceId(device), ConnectionId(connectionId))
                 )
 
           } <+> handler))) orNotFound))

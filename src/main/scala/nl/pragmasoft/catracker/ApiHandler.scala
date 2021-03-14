@@ -5,6 +5,7 @@ import cats.Applicative
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import nl.pragmasoft.catracker.Model.{PositionRepository, StoredPosition}
+import nl.pragmasoft.catracker.TrackerProtocol.UpdatePosition
 import nl.pragmasoft.catracker.http.definitions.{DevicePath, TtnEvent}
 import nl.pragmasoft.catracker.http.{Handler, IncomingEventResponse, PathForDeviceResponse}
 
@@ -12,10 +13,13 @@ import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 
-class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: ActorSystem[Trackers.Command]) extends Handler[F] with LazyLogging {
+class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: ActorSystem[TrackerProtocol.Command]) extends Handler[F] with LazyLogging {
   def pathForDevice(respond: PathForDeviceResponse.type)(device: String): F[PathForDeviceResponse] =
     for {
-      pathPositions <- positions.findForDevice(device)
+      allPathPositions <- positions.findForDevice(device)
+      pathPositions = allPathPositions.headOption map { head =>
+        List(head) ++ allPathPositions.tail.filter(head.recorded - _.recorded < Tracker.RestartTrackingAfterMillis)
+      } getOrElse (List.empty)
       _ = logger.info(s"Fetching path for $device")
     } yield PathForDeviceResponse.Ok(
       DevicePath(
@@ -65,7 +69,7 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: Ac
       temperature = p.temperature,
       counter = e.counter
     )
-    system ! Trackers.UpdatePosition(position)
+    system ! UpdatePosition(position)
 
     for {
       _ <- positions.add(position)
