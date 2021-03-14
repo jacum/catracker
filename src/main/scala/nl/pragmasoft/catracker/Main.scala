@@ -22,9 +22,9 @@ import scala.concurrent.ExecutionContext
 object Main extends IOApp with LazyLogging {
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val config = ConfigFactory.load()
+    val config                                                = ConfigFactory.load()
     implicit val system: ActorSystem[TrackerProtocol.Command] = ActorSystem(Trackers(timer), "main", config)
-    implicit val executionContext: ExecutionContext = system.executionContext
+    implicit val executionContext: ExecutionContext           = system.executionContext
 
     val apiLoggingAction: Option[String => IO[Unit]] = {
       val apiLogger = LoggerFactory.getLogger("HTTP")
@@ -33,27 +33,26 @@ object Main extends IOApp with LazyLogging {
 
     val mainResource: Resource[IO, Server[IO]] =
       for {
-        config <- Config.load()
-        ec <- ExecutionContexts.fixedThreadPool[IO](config.database.threadPoolSize)
-        blocker <- Blocker[IO]
+        config     <- Config.load()
+        ec         <- ExecutionContexts.fixedThreadPool[IO](config.database.threadPoolSize)
+        blocker    <- Blocker[IO]
         transactor <- Database.transactor(config.database, ec, blocker)
-        _ <- Resource.liftF(Database.initialize(transactor))
+        _          <- Resource.liftF(Database.initialize(transactor))
         repository = new PositionDatabase(transactor)
-        handler = new http.Resource[IO]().routes(new ApiHandler[IO](repository, system))
+        handler    = new http.Resource[IO]().routes(new ApiHandler[IO](repository, system))
         apiService <- BlazeServerBuilder[IO](executionContext)
           .withNio2(true)
           .bindSocketAddress(InetSocketAddress.createUnresolved("0.0.0.0", 8081))
-          .withHttpApp(Logger.httpApp(logHeaders = true, logBody = true, logAction = apiLoggingAction)(Router("/api/catracker" -> (
-            CORS(HttpRoutes.of[IO] {
-              case GET -> Root / "health" => Ok()
-              case GET -> Root / "ws" / device / connectionId =>
-                WebSocketBuilder[IO].build(
-                  send = Trackers.toClient(DeviceId(device), ConnectionId(connectionId)),
-                  receive = Trackers.fromClient(DeviceId(device), ConnectionId(connectionId)),
-                  onClose = Trackers.close(DeviceId(device), ConnectionId(connectionId))
-                )
+          .withHttpApp(Logger.httpApp(logHeaders = true, logBody = true, logAction = apiLoggingAction)(Router("/api/catracker" -> (CORS(HttpRoutes.of[IO] {
+                case GET -> Root / "health" => Ok()
+                case GET -> Root / "ws" / device / connectionId =>
+                  WebSocketBuilder[IO].build(
+                    send = Trackers.toClient(DeviceId(device), ConnectionId(connectionId)),
+                    receive = Trackers.fromClient(DeviceId(device), ConnectionId(connectionId)),
+                    onClose = Trackers.close(DeviceId(device), ConnectionId(connectionId))
+                  )
 
-          } <+> handler))) orNotFound))
+              } <+> handler))) orNotFound))
           .resource
       } yield apiService
     mainResource.use(_ => IO.never).as(ExitCode.Success)
