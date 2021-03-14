@@ -1,4 +1,4 @@
-import {WebsocketBuilder} from 'websocket-ts';
+import {WebsocketBuilder, ExponentialBackoff} from 'websocket-ts';
 import {v4 as uuidv4} from 'uuid';
 
 interface DevicePath {
