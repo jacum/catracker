@@ -69,8 +69,8 @@ function initMap(): void {
   } else {
       wsUrl = "ws:";
   }
-//   const host = location.host;
-  const host = "localhost:8081";
+  const host = location.host;
+//   const host = "localhost:8081";
 
   wsUrl += "//" + host + "/api/catracker/ws/" + device + "/" + uuidv4();
   const dataUrl = location.protocol + "//" + host + '/api/catracker/paths/' + device;
