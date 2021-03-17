@@ -40,7 +40,7 @@ object Database extends LazyLogging {
 class PositionDatabase(transactor: Transactor[IO]) extends PositionRepository[IO] {
 
   def add(p: StoredPosition): IO[Unit] =
-    sql"INSERT INTO positions (recorded, app, deviceType, deviceSerial, latitude, longitude, positionFix, bestGateway, bestSNR, battery, temperature, counter) VALUES (${p.recorded}, ${p.app}, ${p.deviceType}, ${p.deviceSerial}, ${p.latitude}, ${p.longitude}, ${p.positionFix}, ${p.bestGateway}, ${p.bestSNR}, ${p.battery}, ${p.temperature}, ${p.counter})".update
+    sql"INSERT INTO positions (recorded, app, deviceType, deviceSerial, latitude, longitude, positionFix, bestGateway, bestSNR, battery, accuracy, temperature, counter) VALUES (${p.recorded}, ${p.app}, ${p.deviceType}, ${p.deviceSerial}, ${p.latitude}, ${p.longitude}, ${p.positionFix}, ${p.bestGateway}, ${p.bestSNR}, ${p.battery}, ${p.accuracy}, ${p.temperature}, ${p.counter})".update
       .withUniqueGeneratedKeys[Long]("id")
       .transact(transactor)
       .map(_ => ())
