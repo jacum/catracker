@@ -13,6 +13,7 @@ object Model {
     positionFix: Boolean,
     bestGateway: String,
     bestSNR: BigDecimal,
+    accuracy: Int,
     battery: Int,
     temperature: Int,
     counter: Long

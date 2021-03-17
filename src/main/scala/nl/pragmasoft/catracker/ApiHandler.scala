@@ -68,6 +68,7 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: Ac
       positionFix = p.gnssFix,
       bestGateway = gw.gtwId,
       bestSNR = gw.snr,
+      accuracy = p.accuracy.toInt,
       battery = p.capacity.toInt,
       temperature = p.temperature,
       counter = e.counter

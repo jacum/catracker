@@ -1,0 +1,2 @@
+ALTER TABLE positions ADD COLUMN `accuracy` TINYINT NOT NULL AFTER `bestSNR`;
+
