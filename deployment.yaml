@@ -78,6 +78,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: catracker-ingress
+  labels:
+    uri: catracker-demo.pragmasoft.nl
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
