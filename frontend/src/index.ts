@@ -2,14 +2,15 @@ import {WebsocketBuilder, ExponentialBackoff} from 'websocket-ts';
 import {v4 as uuidv4} from 'uuid';
 
 interface DevicePath {
-  description: string,
-  lastSeen: string,
-  positions: Array<Position>
+  description: string;
+  lastSeen: string;
+  positions: Array<Position>;
 }
 
 interface Position {
   latitude: number;
   longitude: number;
+  battery: string;
 }
 
 function api<T>(url: string): Promise<T> {
@@ -49,7 +50,7 @@ function redraw(map: google.maps.Map, data: DevicePath, lastSeen: string): void 
          },
          opacity: 1,
          label: {
-           text: lastSeen,
+           text: lastSeen + " | " + last.battery + "%",
            fontSize: "40px"
          },
          icon: {url: "/marker.png", labelOrigin: new google.maps.Point(40,90) },
