@@ -55,6 +55,7 @@ components:
             required:
               - latitude
               - longitude
+              - battery
             properties:
               latitude:
                 type: number
@@ -62,6 +63,8 @@ components:
               longitude:
                 type: number
                 format: double
+              battery:
+                type: number
     TTNEvent:
       type: object
       required:

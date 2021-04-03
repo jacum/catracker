@@ -29,7 +29,7 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: Ac
         lastSeen = pathPositions.headOption.map(p => humanReadable(LocalDateTime.now().atOffset(ZoneOffset.UTC).toInstant.toEpochMilli - p.recorded)).getOrElse("?"),
         positions = pathPositions
           .distinctBy(_.recorded)
-          .map(p => DevicePath.Positions(p.latitude.doubleValue, p.longitude.doubleValue))
+          .map(p => DevicePath.Positions(p.latitude.doubleValue, p.longitude.doubleValue, p.battery))
           .toVector
       )
     )
