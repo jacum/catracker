@@ -12,7 +12,7 @@ body {
 #panel { position: absolute;
 top: 80px; left: 50px; font-size: 30px; z-index: 99; vertical-align: middle; }
 
-#battery {  background: url(battery.png); text-align: center; height: 80px; line-height: 80px; width: 80px; display: inline-block;
+#battery {  background: "/battery.png"; text-align: center; height: 80px; line-height: 80px; width: 80px; display: inline-block;
 background-repeat: no-repeat; background-position: center; background-size: contain; vertical-align: middle; }
 
 #connection {  background: url(red.png); width: 80px; display: inline-block;

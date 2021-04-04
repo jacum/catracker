@@ -16,9 +16,11 @@ import scala.concurrent.duration._
 class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: ActorSystem[TrackerProtocol.Command]) extends Handler[F] with LazyLogging {
   def pathForDevice(respond: PathForDeviceResponse.type)(device: String): F[PathForDeviceResponse] =
     for {
-      allPathPositions <- positions.findForDevice(device)
+      lastPositions <- positions.findForDevice(device)
+      allPathPositions = lastPositions.distinctBy(_.recorded).filter(p => p.accuracy <= 8 && p.positionFix && p.longitude != 0 && p.latitude != 0)
       now = LocalDateTime.now().atOffset(ZoneOffset.UTC).toInstant.toEpochMilli
-      pathPositions = allPathPositions.headOption map { head =>
+      pathPositions = allPathPositions.
+        headOption map { head =>
         List(head) ++
           allPathPositions.tail.filter(now - _.recorded < Tracker.RestartTrackingAfterMillis)
       } getOrElse List.empty
@@ -30,8 +32,6 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: Ac
           description = pathPositions.headOption.map(p => s"${p.app} ${p.deviceType} ${p.deviceSerial}").getOrElse("?"),
           lastSeen = BigDecimal(lastSeen),
           positions = pathPositions
-            .distinctBy(_.recorded)
-            .filter(p => p.accuracy <= 8 && p.positionFix && p.longitude != 0 && p.latitude != 0)
             .map(p => DevicePath.Positions(p.latitude.doubleValue, p.longitude.doubleValue, p.battery))
             .toVector
         )
