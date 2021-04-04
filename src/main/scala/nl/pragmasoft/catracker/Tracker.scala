@@ -126,7 +126,6 @@ object Tracker {
 
   case class State(deviceId: DeviceId, positions: List[StoredPosition]) {
     def messagesOnIncomingPosition(incoming: StoredPosition): List[ServerMessage] =
-      (if (incoming.battery > 30) List.empty else List(ServerMessage(deviceId, BatteryWarning(incoming.battery)))) ++
           (positions match {
             case Nil => List(ServerMessage(deviceId, LiveTrackingStarted))
             case last :: _

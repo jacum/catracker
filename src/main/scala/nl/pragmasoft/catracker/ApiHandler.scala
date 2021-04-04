@@ -23,38 +23,23 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: Ac
           allPathPositions.tail.filter(now - _.recorded < Tracker.RestartTrackingAfterMillis)
       } getOrElse List.empty
       _ = logger.info(s"Fetching path for $device")
-    } yield PathForDeviceResponse.Ok(
-      DevicePath(
-        description = pathPositions.headOption.map(p => s"${p.app} ${p.deviceType} ${p.deviceSerial}").getOrElse("?"),
-        lastSeen = pathPositions.headOption.map(p => humanReadable(LocalDateTime.now().atOffset(ZoneOffset.UTC).toInstant.toEpochMilli - p.recorded)).getOrElse("?"),
-        positions = pathPositions
-          .distinctBy(_.recorded)
-          .filter(_.accuracy >= 8)
-          .map(p => DevicePath.Positions(p.latitude.doubleValue, p.longitude.doubleValue, p.battery))
-          .toVector
+    } yield {
+      val lastSeen = pathPositions.headOption.map(p => LocalDateTime.now().atOffset(ZoneOffset.UTC).toInstant.toEpochMilli - p.recorded).getOrElse(0L)
+      PathForDeviceResponse.Ok(
+        DevicePath(
+          description = pathPositions.headOption.map(p => s"${p.app} ${p.deviceType} ${p.deviceSerial}").getOrElse("?"),
+          lastSeen = BigDecimal(lastSeen),
+          positions = pathPositions
+            .distinctBy(_.recorded)
+            .filter(p => p.accuracy <= 8 && p.positionFix && p.longitude != 0 && p.latitude != 0)
+            .map(p => DevicePath.Positions(p.latitude.doubleValue, p.longitude.doubleValue, p.battery))
+            .toVector
+        )
       )
-    )
+    }
 
   private val units   = List((TimeUnit.DAYS, "d"), (TimeUnit.HOURS, "h"), (TimeUnit.MINUTES, "m"))
   private val JustNow = (1 minute).toMillis
-
-  private def humanReadable(timediff: Long): String =
-    if (timediff < JustNow)
-      "Now"
-    else {
-      val init = ("", timediff)
-      units
-        .foldLeft(init) {
-          case (acc, next) =>
-            val (human, rest) = acc
-            val (unit, name)  = next
-            val res           = unit.convert(rest, TimeUnit.MILLISECONDS)
-            val str           = if (res > 0) human + " " + res + " " + name else human
-            val diff          = rest - TimeUnit.MILLISECONDS.convert(res, unit)
-            (str, diff)
-        }
-        ._1
-    }
 
   def incomingEvent(respond: IncomingEventResponse.type)(e: TtnEvent): F[IncomingEventResponse] = {
     val gw = e.metadata.gateways.maxBy(_.snr)
@@ -69,7 +54,7 @@ class ApiHandler[F[_]: Applicative](positions: PositionRepository[F], system: Ac
       positionFix = p.gnssFix,
       bestGateway = gw.gtwId,
       bestSNR = gw.snr,
-      accuracy = p.accuracy.toInt,
+      accuracy = p.accuracy,
       battery = p.capacity.toInt,
       temperature = p.temperature,
       counter = e.counter

@@ -19,7 +19,7 @@ object MainTrackerSimulator extends IOApp with LazyLogging {
     BlazeClientBuilder[IO](ExecutionContext.global).resource.use { client =>
       val ttnPoster = new Client[IO]("http://localhost:8081/api/catracker") (implicitly[Async[IO]], client)
       def send: IO[IncomingEventResponse] = ttnPoster.incomingEvent(createTtnEvent)
-      def repeat: IO[Unit] = send >> timer.sleep(2 seconds) >> repeat
+      def repeat: IO[Unit] = send >> timer.sleep(10 seconds) >> repeat
       repeat
     } .as(ExitCode.Success)
 
@@ -28,7 +28,7 @@ object MainTrackerSimulator extends IOApp with LazyLogging {
 
   private def createTtnEvent: TtnEvent =
     TtnEvent("pragma_cats_dragino","dragino_test1","A840416B61826E5F",93,
-      TtnEvent.PayloadFields(0,0,true,52.331956 + Random.between(-0.001,+0.001),4.944941 + Random.between(-0.001,+0.001),Some(2),0,3.685),
+      TtnEvent.PayloadFields(4,60,true,52.331956 + Random.between(-0.001,+0.001),4.944941 + Random.between(-0.001,+0.001),Some(2),0,3.685),
       TtnEvent.Metadata(LocalDateTime.now().atOffset(ZoneOffset.UTC),868.1,
         "LORA","SF7BW125","4/5",
         Vector(TtnEvent.Metadata.Gateways("eui-58a0cbfffe802a34",

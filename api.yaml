@@ -47,7 +47,7 @@ components:
         description:
           type: string
         lastSeen:
-          type: string
+          type: number
         positions:
           type: array
           items:
