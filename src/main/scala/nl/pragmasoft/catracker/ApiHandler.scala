@@ -68,15 +68,12 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
 
   def incomingEventKpn(respond: IncomingEventKpnResponse.type)(body: Vector[KpnEventRecord]): F[IncomingEventKpnResponse] = {
 
-    Async[F].delay {
-      KpnEvent.decode(body).map { position =>
-        system ! UpdatePosition(position)
-        positions.add(position)
-      } getOrElse {
-        logger.warn(s"Can't parse KPN records from $body")
-      }
-      IncomingEventKpnResponse.Created
-    }
+      val position = KpnEvent.decode(body).get
+      system ! UpdatePosition(position)
+      for {
+        _ <- positions.add(position)
+      } yield IncomingEventKpnResponse.Created
+
   }
 
 }
