@@ -71,30 +71,10 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
 
   def incomingEventKpn(respond: IncomingEventKpnResponse.type)(body: Vector[KpnEventRecord]): F[IncomingEventKpnResponse] = {
 
-
-
-//    KpnEvent.decodeKPNEvent(body)
-//
-//    val position = StoredPosition(
-//      recorded = gw.time.toInstant.toEpochMilli,
-//      app = e.appId,
-//      deviceType = e.devId,
-//      deviceSerial = e.hardwareSerial,
-//      latitude = p.latitude,
-//      longitude = p.longitude,
-//      positionFix = p.gnssFix,
-//      bestGateway = gw.gtwId,
-//      bestSNR = gw.snr,
-//      accuracy = p.accuracy,
-//      battery = p.capacity.toInt,
-//      temperature = p.temperature,
-//      counter = e.counter
-//    )
-//    system ! UpdatePosition(position)
-//
-//    for {
-//      _ <- positions.add(position)
-//    } yield IncomingEventResponse.Created
+    KpnEvent.decode(body).map { position =>
+      system ! UpdatePosition(position)
+      positions.add(position)
+    }
     Async[F].pure(IncomingEventKpnResponse.Created)
   }
 
