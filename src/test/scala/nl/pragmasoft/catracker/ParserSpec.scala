@@ -3,8 +3,8 @@ package nl.pragmasoft.catracker
 import cats.effect.IO
 import io.circe
 import io.circe.parser._
-import nl.pragmasoft.catracker.Model.PositionRepository
-import nl.pragmasoft.catracker.http.definitions.TtnEvent
+import nl.pragmasoft.catracker.Model.{PositionRepository, StoredPosition}
+import nl.pragmasoft.catracker.http.definitions.{KpnEventRecord, TtnEvent}
 import org.scalatest.matchers.should.Matchers
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.wordspec.AnyWordSpec
@@ -68,6 +68,16 @@ class ParserSpec extends AnyWordSpec with MockFactory with Matchers {
           Vector(TtnEvent.Metadata.Gateways("eui-58a0cbfffe802a34",
             LocalDateTime.parse("2020-12-28T11:36:17.480709075Z", ISO_DATE_TIME).atOffset(ZoneOffset.UTC),0,-87,9.75))),
       Some("https://integrations.thethingsnetwork.org/ttn-eu/api/v2/down/pragma_cats_dragino/catracker?key=ttn-account-v2.q3vCLU1Une4Z7lxiSy3P1ZG8cBfaxQB66AbnL02aHNg")))
+    }
+
+    "be parsed from Browan via KPN" in {
+      KpnEvent.decode(
+        parse(
+          Source.fromResource("kpn-2.json").getLines().mkString("\n")
+        ).left.map(f => fail(s"can't parse: $f")).merge.asArray.get
+          .map(json => KpnEventRecord.decodeKpnEventRecord.decodeJson(json).left.map(f => fail(s"can't parse: $f")).merge)
+      ) shouldBe
+        Some(StoredPosition(1618049415,1618049415,"kpn","kpn","E8E1E10001060A56",52.331967,4.944089,false,"",0,93,16,19,0))
     }
   }
 

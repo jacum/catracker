@@ -3,7 +3,7 @@ package nl.pragmasoft.catracker
 import cats.effect.{Async, ExitCode, IO, IOApp}
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
-import nl.pragmasoft.catracker.http.client.{Client, IncomingEventResponse}
+import nl.pragmasoft.catracker.http.client.{Client, IncomingEventTtnResponse}
 import nl.pragmasoft.catracker.http.client.definitions.TtnEvent
 import org.http4s.client.blaze.BlazeClientBuilder
 
@@ -18,7 +18,7 @@ object MainTrackerSimulator extends IOApp with LazyLogging {
 
     BlazeClientBuilder[IO](ExecutionContext.global).resource.use { client =>
       val ttnPoster = new Client[IO]("http://localhost:8081/api/catracker") (implicitly[Async[IO]], client)
-      def send: IO[IncomingEventResponse] = ttnPoster.incomingEvent(createTtnEvent)
+      def send: IO[IncomingEventTtnResponse] = ttnPoster.incomingEventTtn(createTtnEvent)
       def repeat: IO[Unit] = send >> timer.sleep(10 seconds) >> repeat
       repeat
     } .as(ExitCode.Success)

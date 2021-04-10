@@ -67,6 +67,7 @@ val `root` = project.in(file("."))
       "org.http4s" %% "http4s-blaze-client" % http4sVersion,
       "org.http4s" %% "http4s-circe" % http4sVersion,
       "org.http4s" %% "http4s-dsl" % http4sVersion,
+      "commons-codec" % "commons-codec" % "1.9",
       "org.http4s" %% "http4s-prometheus-metrics" % http4sVersion,
       "com.h2database" % "h2" % h2Version,
       "mysql" % "mysql-connector-java" % "8.0.23",

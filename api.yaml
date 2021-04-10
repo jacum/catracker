@@ -6,13 +6,27 @@ info:
 paths:
   /ttnhttp:
     post:
-      operationId: incomingEvent
+      operationId: incomingEventTtn
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/definitions/TTNEvent'
+      responses:
+        '201':
+          description: Created
+  /kpn:
+    post:
+      operationId: incomingEventKpn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/KPNEventRecord'
       responses:
         '201':
           description: Created
@@ -65,6 +79,19 @@ components:
                 format: double
               battery:
                 type: number
+    KPNEventRecord:
+      type: object
+      properties:
+        bn:
+          type: string
+        bt:
+          type: number
+        v:
+          type: number
+        vs:
+          type: string
+        n:
+          type: string
     TTNEvent:
       type: object
       required:
