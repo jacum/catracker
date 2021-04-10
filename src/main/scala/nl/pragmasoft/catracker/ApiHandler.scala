@@ -40,9 +40,6 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
       )
     }
 
-  private val units   = List((TimeUnit.DAYS, "d"), (TimeUnit.HOURS, "h"), (TimeUnit.MINUTES, "m"))
-  private val JustNow = (1 minute).toMillis
-
   def incomingEventTtn(respond: IncomingEventTtnResponse.type)(e: TtnEvent): F[IncomingEventTtnResponse] = {
     val gw = e.metadata.gateways.maxBy(_.snr)
     val p  = e.payloadFields
@@ -74,6 +71,8 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
     KpnEvent.decode(body).map { position =>
       system ! UpdatePosition(position)
       positions.add(position)
+    } getOrElse {
+      logger.warn(s"Can't parse KPN records from $body")
     }
     Async[F].pure(IncomingEventKpnResponse.Created)
   }

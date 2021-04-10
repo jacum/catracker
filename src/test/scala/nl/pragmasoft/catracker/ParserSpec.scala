@@ -73,6 +73,13 @@ class ParserSpec extends AnyWordSpec with MockFactory with Matchers {
     "be parsed from Browan via KPN" in {
       KpnEvent.decode(
         parse(
+          Source.fromResource("kpn.json").getLines().mkString("\n")
+        ).left.map(f => fail(s"can't parse: $f")).merge.asArray.get
+          .map(json => KpnEventRecord.decodeKpnEventRecord.decodeJson(json).left.map(f => fail(s"can't parse: $f")).merge)
+      ) shouldBe
+        Some(StoredPosition(1618061599,1618061599,"kpn","kpn","E8E1E10001060A56",0.0,0.0,false,"",0,93,4,20,0))
+      KpnEvent.decode(
+        parse(
           Source.fromResource("kpn-2.json").getLines().mkString("\n")
         ).left.map(f => fail(s"can't parse: $f")).merge.asArray.get
           .map(json => KpnEventRecord.decodeKpnEventRecord.decodeJson(json).left.map(f => fail(s"can't parse: $f")).merge)

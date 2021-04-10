@@ -19,7 +19,6 @@ object KpnEvent {
       val byte10a: Byte = (bytes(10) & 0x1).toByte
       val byte10b: Byte = if ((byte10a & (1 << 4)) != 0) (byte10a | 0xe0).toByte else byte10a
 
-
       StoredPosition(
         recorded = header.bt.get.toLong,
         app = "kpn",
