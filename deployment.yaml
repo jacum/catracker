@@ -38,7 +38,7 @@ spec:
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: catracker-secrets
+                  name: catracker
                   key: DATABASE_PASSWORD
           securityContext:
             allowPrivilegeEscalation: false
