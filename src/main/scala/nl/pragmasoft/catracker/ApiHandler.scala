@@ -5,15 +5,12 @@ import cats.Applicative
 import cats.effect.Async
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
-import io.circe.Json
 import nl.pragmasoft.catracker.Model.{PositionRepository, StoredPosition}
 import nl.pragmasoft.catracker.TrackerProtocol.UpdatePosition
 import nl.pragmasoft.catracker.http.definitions.{DevicePath, KpnEventRecord, TtnEvent}
 import nl.pragmasoft.catracker.http.{Handler, IncomingEventKpnResponse, IncomingEventTtnResponse, PathForDeviceResponse}
 
 import java.time.{LocalDateTime, ZoneOffset}
-import java.util.concurrent.TimeUnit
-import scala.concurrent.duration._
 
 class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], system: ActorSystem[TrackerProtocol.Command]) extends Handler[F] with LazyLogging {
   def pathForDevice(respond: PathForDeviceResponse.type)(device: String): F[PathForDeviceResponse] =

@@ -13,14 +13,13 @@ object KpnEvent {
     for {
       header <- body.find(_.bn.isDefined)
       payload <- body.find(_.n.contains("payload"))
-      port <- body.find(_.n.contains("port"))
     } yield {
       val bytes = Hex.decodeHex(payload.vs.get.toCharArray)
       val byte10a: Byte = (bytes(10) & 0x1).toByte
       val byte10b: Byte = if ((byte10a & (1 << 4)) != 0) (byte10a | 0xe0).toByte else byte10a
 
       StoredPosition(
-        recorded = header.bt.get.toLong,
+        recorded = header.bt.get.toLong * 1000,
         app = "kpn",
         deviceType = "kpn",
         deviceSerial = header.bn.get.split(':')(3),
