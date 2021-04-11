@@ -119,7 +119,7 @@ object Trackers extends LazyLogging {
 object Tracker {
 
   import TrackerProtocol._
-  val RestartTrackingAfterMillis: Long = (15 minutes).toMillis
+  val RestartTrackingAfterMillis: Long = (60 minutes).toMillis
 
   sealed trait Event
   final case class PositionUpdated(position: StoredPosition) extends Event

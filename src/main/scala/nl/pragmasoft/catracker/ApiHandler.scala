@@ -16,7 +16,7 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
   def pathForDevice(respond: PathForDeviceResponse.type)(device: String): F[PathForDeviceResponse] =
     for {
       lastPositions <- positions.findForDevice(device)
-      allPathPositions = lastPositions.distinctBy(_.recorded).filter(p => p.accuracy <= 8 && p.positionFix && p.longitude != 0 && p.latitude != 0)
+      allPathPositions = lastPositions.distinctBy(_.recorded).filter(p => p.accuracy <= 16 && p.positionFix && p.longitude != 0 && p.latitude != 0)
       now = LocalDateTime.now().atOffset(ZoneOffset.UTC).toInstant.toEpochMilli
       pathPositions = allPathPositions.
         headOption map { head =>
