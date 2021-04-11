@@ -5,7 +5,10 @@ trigger:
     include:
       - master
 
-pool: 'hetzner03'
+pool: 'hetzner04'
+
+variables:
+  - group: catracker-secrets
 
 steps:
   - task: Bash@3
@@ -50,4 +53,6 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        cat deployment.yaml | sed "s#APP_VERSION#$(Build.BuildNumber)#g" | kubectl apply -f -
+        export APP_VERSION=$(Build.BuildNumber)
+        export DATABASE_PASSWORD=$(DATABASE_PASSWORD)
+        cat deployment.yaml | envsubst | kubectl apply -f -

@@ -119,7 +119,7 @@ object Trackers extends LazyLogging {
 object Tracker {
 
   import TrackerProtocol._
-  val RestartTrackingAfterMillis: Long = (60 minutes).toMillis
+  val TrackingTailLength: Long = (60 minutes).toMillis
 
   sealed trait Event
   final case class PositionUpdated(position: StoredPosition) extends Event
@@ -127,12 +127,12 @@ object Tracker {
   case class State(deviceId: DeviceId, positions: List[StoredPosition]) {
     def messagesOnIncomingPosition(incoming: StoredPosition): List[ServerMessage] =
           (positions match {
-            case Nil => List(ServerMessage(deviceId, LiveTrackingStarted))
+            case Nil                                                                              => List(ServerMessage(deviceId, LiveTrackingStarted))
             case last :: _
                 if incoming.positionFix &&
-                  (!last.positionFix || (incoming.recorded - last.recorded) > RestartTrackingAfterMillis) =>
+                  (!last.positionFix || (incoming.recorded - last.recorded) > TrackingTailLength) =>
               List(ServerMessage(deviceId, LiveTrackingStarted))
-            case p :: _ if p.positionFix && !incoming.positionFix =>
+            case p :: _ if p.positionFix && !incoming.positionFix                                 =>
               List(ServerMessage(deviceId, FixLost))
 
             case _ => List.empty
@@ -141,7 +141,7 @@ object Tracker {
   private def appendPosition(positions: List[StoredPosition], newPosition: StoredPosition): List[StoredPosition] =
     positions.headOption
       .map(h =>
-        if (newPosition.recorded > h.recorded + RestartTrackingAfterMillis) List(newPosition)
+        if (newPosition.recorded > h.recorded + TrackingTailLength) List(newPosition)
         else newPosition :: positions
       )
       .getOrElse(List(newPosition))
