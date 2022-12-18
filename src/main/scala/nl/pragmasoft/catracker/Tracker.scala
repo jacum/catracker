@@ -126,17 +126,17 @@ object Tracker {
 
   case class State(deviceId: DeviceId, positions: List[StoredPosition]) {
     def messagesOnIncomingPosition(incoming: StoredPosition): List[ServerMessage] =
-          (positions match {
-            case Nil                                                                              => List(ServerMessage(deviceId, LiveTrackingStarted))
-            case last :: _
-                if incoming.positionFix &&
-                  (!last.positionFix || (incoming.recorded - last.recorded) > TrackingTailLength) =>
-              List(ServerMessage(deviceId, LiveTrackingStarted))
-            case p :: _ if p.positionFix && !incoming.positionFix                                 =>
-              List(ServerMessage(deviceId, FixLost))
+      positions match {
+        case Nil => List(ServerMessage(deviceId, LiveTrackingStarted))
+        case last :: _
+            if incoming.positionFix &&
+              (!last.positionFix || (incoming.recorded - last.recorded) > TrackingTailLength) =>
+          List(ServerMessage(deviceId, LiveTrackingStarted))
+        case p :: _ if p.positionFix && !incoming.positionFix =>
+          List(ServerMessage(deviceId, FixLost))
 
-            case _ => List.empty
-          })
+        case _ => List.empty
+      }
   }
   private def appendPosition(positions: List[StoredPosition], newPosition: StoredPosition): List[StoredPosition] =
     positions.headOption

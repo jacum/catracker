@@ -95,99 +95,180 @@ components:
     TTNEvent:
       type: object
       required:
-        - app_id
-        - dev_id
-        - hardware_serial
-        - port
-        - counter
-        - payload_fields
-        - metadata
+        - end_device_ids
+        - uplink_message
+        - received_at
       properties:
-        app_id:
-          type: string
-        dev_id:
-          type: string
-        hardware_serial:
-          type: string
-        counter:
-          type: integer
-          format: int32
-        payload_fields:
+        end_device_ids:
           type: object
           required:
-            - accuracy
-            - capacity
-            - gnss_fix
-            - latitude
-            - longitude
-            - temperature
-            - voltage
+            - device_id
+            - application_ids
+            - dev_eui
+            - join_eui
+            - dev_addr
           properties:
-            accuracy:
-              type: integer
-              format: int32
-            capacity:
-              type: number
-            gnss_fix:
-              type: boolean
-            latitude:
-              type: number
-              format: double
-            longitude:
-              type: number
-              format: double
-            port:
-              type: integer
-              format: int32
-            temperature:
-              type: integer
-              format: int32
-            voltage:
-              type: number
-        metadata:
+            device_id:
+              type: string
+            application_ids:
+              type: object
+              required:
+                - application_id
+              properties:
+                application_id:
+                  type: string
+            dev_eui:
+              type: string
+            join_eui:
+              type: string
+            dev_addr:
+              type: string
+        correlation_ids:
+          type: array
+          items:
+            type: string
+        received_at:
+          type: string
+        uplink_message:
           type: object
           required:
-            - time
-            - frequency
-            - modulation
-            - data_rate
-            - coding_rate
-            - gateways
+            - decoded_payload
+            - f_port
+            - f_cnt
+            - rx_metadata
+            - settings
+            - received_at
+            - consumed_airtime
           properties:
-            time:
+            session_key_id:
               type: string
-              format: date-time
-            frequency:
-              type: number
-            modulation:
+            f_port:
+              type: integer
+              format: int32
+            f_cnt:
+              type: integer
+              format: int32
+            frm_payload:
               type: string
-            data_rate:
-              type: string
-            coding_rate:
-              type: string
-            gateways:
+            decoded_payload:
+              type: object
+              required:
+                - accuracy
+                - capacity
+                - fix
+                - latitude
+                - longitude
+                - temperature
+                - voltage
+              properties:
+                accuracy:
+                  type: integer
+                  format: int32
+                capacity:
+                  type: number
+                fix:
+                  type: boolean
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+                temperature:
+                  type: integer
+                  format: int32
+                voltage:
+                  type: number
+            rx_metadata:
               type: array
               items:
                 type: object
                 required:
-                  - gtw_id
+                  - gateway_ids
                   - time
-                  - channel
+                  - timestamp
                   - rssi
+                  - channel_rssi
                   - snr
+                  - received_at
+                  - uplink_token
                 properties:
-                  gtw_id:
-                    type: string
+                  gateway_ids:
+                    type: object
+                    required:
+                      - gateway_id
+                      - eui
+                    properties:
+                      gateway_id:
+                        type: string
+                      eui:
+                        type: string
                   time:
                     type: string
-                    format: date-time
-                  channel:
+                  timestamp:
+                    type: integer
+                    format: int64
+                  rssi:
                     type: integer
                     format: int32
-                  rssi:
+                  channel_rssi:
                     type: integer
                     format: int32
                   snr:
                     type: number
-        downlink_url:
-          type: string
+                  uplink_token:
+                    type: string
+                  received_at:
+                    type: string
+                    format: date-time
+            settings:
+              type: object
+              required:
+                - data_rate
+                - frequency
+                - timestamp
+              properties:
+                data_rate:
+                  type: object
+                  required:
+                    - loar
+                  properties:
+                    lora:
+                      type: object
+                      required:
+                        - bandwidth
+                        - spreading_factor
+                        - coding_rate
+                      properties:
+                        bandwidth:
+                          type: integer
+                          format: int32
+                        spreading_factor:
+                          type: integer
+                          format: int32
+                        coding_rate:
+                          type: string
+                frequency:
+                  type: string
+                timestamp:
+                  type: integer
+                  format: int64
+                time:
+                  type: string
+            received_at:
+              type: string
+              format: date-time
+            consumed_airtime:
+              type: string
+            network_ids:
+              type: object
+              properties:
+                net_id:
+                  type: string
+                tenant_id:
+                  type: string
+                cluster_id:
+                  type: string
+                cluster_address:
+                  type: string
+

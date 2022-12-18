@@ -1,7 +1,6 @@
 package nl.pragmasoft.catracker
 
 import akka.actor.typed.ActorSystem
-import cats.Applicative
 import cats.effect.Async
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
@@ -12,13 +11,12 @@ import nl.pragmasoft.catracker.http.{Handler, IncomingEventKpnResponse, Incoming
 
 import java.time.{LocalDateTime, ZoneOffset}
 
-class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], system: ActorSystem[TrackerProtocol.Command]) extends Handler[F] with LazyLogging {
+class ApiHandler[F[_]: Async](positions: PositionRepository[F], system: ActorSystem[TrackerProtocol.Command]) extends Handler[F] with LazyLogging {
   def pathForDevice(respond: PathForDeviceResponse.type)(device: String): F[PathForDeviceResponse] =
     for {
       lastPositions <- positions.findForDevice(device)
       allPathPositions = lastPositions.distinctBy(_.recorded).filter(p => p.accuracy <= 16 && p.positionFix && p.longitude != 0 && p.latitude != 0)
-      pathPositions = allPathPositions.
-        headOption map { head =>
+      pathPositions = allPathPositions.headOption map { head =>
         List(head) ++
           allPathPositions.tail.filter(head.recorded - _.recorded < Tracker.TrackingTailLength)
       } getOrElse List.empty
@@ -37,22 +35,22 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
     }
 
   def incomingEventTtn(respond: IncomingEventTtnResponse.type)(e: TtnEvent): F[IncomingEventTtnResponse] = {
-    val gw = e.metadata.gateways.maxBy(_.snr)
-    val p  = e.payloadFields
+    val gw = e.uplinkMessage.rxMetadata.maxBy(_.snr)
+    val p  = e.uplinkMessage.decodedPayload
     val position = StoredPosition(
-      recorded = gw.time.toInstant.toEpochMilli,
-      app = e.appId,
-      deviceType = e.devId,
-      deviceSerial = e.hardwareSerial,
+      recorded = e.uplinkMessage.receivedAt.toInstant.toEpochMilli,
+      app = e.endDeviceIds.applicationIds.applicationId,
+      deviceType = e.endDeviceIds.deviceId,
+      deviceSerial = e.endDeviceIds.devEui,
       latitude = p.latitude,
       longitude = p.longitude,
-      positionFix = p.gnssFix,
-      bestGateway = gw.gtwId,
+      positionFix = p.fix,
+      bestGateway = gw.gatewayIds.gatewayId,
       bestSNR = gw.snr,
       accuracy = p.accuracy,
       battery = p.capacity.toInt,
       temperature = p.temperature,
-      counter = e.counter
+      counter = e.uplinkMessage.fCnt
     )
     system ! UpdatePosition(position)
 
@@ -61,14 +59,13 @@ class ApiHandler[F[_]: Applicative: Async](positions: PositionRepository[F], sys
     } yield IncomingEventTtnResponse.Created
   }
 
-
   def incomingEventKpn(respond: IncomingEventKpnResponse.type)(body: Vector[KpnEventRecord]): F[IncomingEventKpnResponse] = {
 
-      val position = KpnEvent.decode(body).get
-      system ! UpdatePosition(position)
-      for {
-        _ <- positions.add(position)
-      } yield IncomingEventKpnResponse.Created
+    val position = KpnEvent.decode(body).get
+    system ! UpdatePosition(position)
+    for {
+      _ <- positions.add(position)
+    } yield IncomingEventKpnResponse.Created
 
   }
 

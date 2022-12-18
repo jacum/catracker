@@ -1,0 +1,71 @@
+{
+  "end_device_ids": {
+    "device_id": "tracker-001",
+    "application_ids": {
+      "application_id": "cat-tracker"
+    },
+    "dev_eui": "E8E1E10001060F3E",
+    "join_eui": "E8E1E10001013640",
+    "dev_addr": "260B0A9D"
+  },
+  "correlation_ids": [
+    "as:up:01GMJ5F26ATQGZD5AZDF2DWGRN",
+    "gs:conn:01GMFW99RHK9NNS8NBKCJTYWKX",
+    "gs:up:host:01GMFW99RRSW12EMWV359QWGX4",
+    "gs:uplink:01GMJ5F1ZS9QX041VYAAXNKNNW",
+    "ns:uplink:01GMJ5F1ZTC44ZG72MF234ZWVS",
+    "rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01GMJ5F1ZT3PCZYSMN1KFZFBM5",
+    "rpc:/ttn.lorawan.v3.NsAs/HandleUplink:01GMJ5F269X4JVRWR98Y3V45G6"
+  ],
+  "received_at": "2022-12-18T08:26:34.570184942Z",
+  "uplink_message": {
+    "session_key_id": "AYUkRTQ8WqF2tb7DYB8PsA==",
+    "f_port": 136,
+    "f_cnt": 7,
+    "frm_payload": "CVw1AAAAAAAAAAA=",
+    "decoded_payload": {
+      "accuracy": 4,
+      "capacity": 33.33333333333333,
+      "fix": false,
+      "latitude": 0,
+      "longitude": 0,
+      "temperature": 21,
+      "voltage": 3.7
+    },
+    "rx_metadata": [
+      {
+        "gateway_ids": {
+          "gateway_id": "eui-58a0cbfffe802c19",
+          "eui": "58A0CBFFFE802C19"
+        },
+        "time": "2022-12-18T08:26:34.283977985Z",
+        "timestamp": 3719025443,
+        "rssi": -65,
+        "channel_rssi": -65,
+        "snr": 8.75,
+        "uplink_token": "CiIKIAoUZXVpLTU4YTBjYmZmZmU4MDJjMTkSCFigy//+gCwZEKOmr+0NGgwIup37nAYQ3bGurAEguIHDuZ65EQ==",
+        "received_at": "2022-12-18T08:26:34.310073949Z"
+      }
+    ],
+    "settings": {
+      "data_rate": {
+        "lora": {
+          "bandwidth": 125000,
+          "spreading_factor": 7,
+          "coding_rate": "4/5"
+        }
+      },
+      "frequency": "867300000",
+      "timestamp": 3719025443,
+      "time": "2022-12-18T08:26:34.283977985Z"
+    },
+    "received_at": "2022-12-18T08:26:34.362715943Z",
+    "consumed_airtime": "0.061696s",
+    "network_ids": {
+      "net_id": "000013",
+      "tenant_id": "ttn",
+      "cluster_id": "eu1",
+      "cluster_address": "eu1.cloud.thethings.network"
+    }
+  }
+}
