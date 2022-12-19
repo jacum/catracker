@@ -47,7 +47,7 @@ class ApiHandler[F[_]: Async](positions: PositionRepository[F], system: ActorSys
       positionFix = p.fix,
       bestGateway = gw.gatewayIds.gatewayId,
       bestSNR = gw.snr,
-      accuracy = Math.max(p.accuracy, 127),
+      accuracy = p.accuracy,
       battery = p.capacity.toInt,
       temperature = p.temperature,
       counter = e.uplinkMessage.fCnt
